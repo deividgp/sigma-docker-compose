@@ -1,0 +1,63 @@
+version: '3.8'
+
+services:
+  user_service:
+    image: deividgp/sigma-user-service:latest
+    container_name: sigma-user-service
+    ports:
+      - "8081:8080"
+    depends_on:
+      - mongodb
+    networks:
+      - db-network
+      - web-network
+
+  security_service:
+    image: deividgp/sigma-security-service:latest
+    container_name: sigma-security-service
+    ports:
+      - "8082:8080"
+    depends_on:
+      - mongodb
+    networks:
+      - db-network
+      - web-network
+
+  server_service:
+    image: deividgp/sigma-server-service:latest
+    container_name: sigma-server-service
+    ports:
+      - "8083:8080"
+    depends_on:
+      - mongodb
+    networks:
+      - db-network
+      - web-network
+
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb
+    ports:
+      - "27017:27017"
+    networks:
+      - db-network
+    volumes:
+      - mongodb_data:/data/db
+
+  nginx:
+    image: nginx:latest
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+    networks:
+      - web-network
+
+volumes:
+  mongodb_data:
+networks:
+  web-network:
+    name: web-network
+  db-network:
+    name: db-network
